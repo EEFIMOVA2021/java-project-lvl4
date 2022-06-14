@@ -42,6 +42,10 @@ application {
     mainClass = 'hexlet.code.App'
 }
 
+jacoco {
+    toolVersion = "0.8.8"
+}
+
 test {
     compileTestJava.options.encoding = "UTF-8"
     useJUnitPlatform()
