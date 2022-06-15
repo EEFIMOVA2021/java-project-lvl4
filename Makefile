@@ -7,6 +7,9 @@ lint:
 test:
 	./gradlew test
 
+run:
+	./gradlew run
+
 report:
 	./gradlew jacocoTestReport
 
