@@ -16,4 +16,7 @@ report:
 build: lint test
 	./gradlew clean build
 
+install:
+	./gradlew install
+
 .PHONY: build
