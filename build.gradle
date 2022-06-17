@@ -10,10 +10,9 @@ plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     id 'application'
     id 'checkstyle'
-    id 'com.github.ben-manes.versions' version '0.39.0'
     id 'com.adarshr.test-logger' version '3.0.0'
-    id 'io.ebean' version '12.11.5'
     id 'jacoco'
+    id 'io.ebean' version '12.15.1'
 }
 
 group = 'hexlet.code'
@@ -36,6 +35,25 @@ dependencies {
     implementation 'org.slf4j:slf4j-simple:1.7.36'
     testImplementation 'org.assertj:assertj-core:3.19.0'
     testImplementation 'com.konghq:unirest-java:3.13.0'
+
+    implementation 'com.h2database:h2:2.1.210'
+    implementation 'org.postgresql:postgresql:42.3.3'
+
+    implementation 'io.ebean:ebean:12.15.1'
+    implementation 'io.ebean:ebean-ddl-generator:12.15.1'
+    implementation 'io.ebean:ebean-querybean:12.15.1'
+    implementation 'io.ebean:ebean-migration:12.15.1'
+    implementation 'io.ebean:ebean-annotation:7.7'
+    annotationProcessor 'io.ebean:querybean-generator:12.15.1'
+
+    // NOTE: ebean-ddl-generator требует старые зависимости, которых нет в java 9 и выше
+    implementation 'org.glassfish.jaxb:jaxb-runtime:2.3.5'
+    implementation 'javax.activation:activation:1.1.1'
+
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.8.2'
+    testImplementation 'org.assertj:assertj-core:3.22.0'
+    testImplementation 'io.ebean:ebean-test:12.15.1'
 }
 
 application {
@@ -71,3 +89,8 @@ jacocoTestReport {
 
 task stage(dependsOn: ['clean', 'installDist'])
 installDist.mustRunAfter clean
+
+task generateMigrations(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'hexlet.code.MigrationGenerator'
+}

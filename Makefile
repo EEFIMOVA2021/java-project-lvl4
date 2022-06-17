@@ -19,4 +19,7 @@ build: lint test
 install:
 	./gradlew install
 
+generate-migrations:
+	./gradlew generateMigrations
+
 .PHONY: build
