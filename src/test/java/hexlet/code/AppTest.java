@@ -31,11 +31,12 @@ class AppTest {
     }
 
     @Test
-    void testGetHelloWorld() {
+    void testRoot() {
         HttpResponse<String> response = Unirest
                 .get(baseUrl)
                 .asString();
         String content = response.getBody();
-        assertThat(content).isEqualTo("Hello World");
+        assertThat(content).contains("Анализатор страниц");
+        assertThat(content).contains("Бесплатно проверяйте сайты на SEO пригодность");
     }
 }

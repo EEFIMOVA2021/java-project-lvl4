@@ -3,6 +3,8 @@
  */
 package hexlet.code;
 
+import hexlet.code.controllers.RootController;
+
 import io.javalin.Javalin;
 import io.javalin.plugin.rendering.template.JavalinThymeleaf;
 
@@ -24,11 +26,15 @@ public class App {
             JavalinThymeleaf.configure(getTemplateEngine());
         });
         addRoutes(app);
+        app.before(ctx -> {
+            ctx.attribute("ctx", ctx);
+        });
         return app;
     }
 
     private static void addRoutes(Javalin app) {
-        app.get("/", ctx -> ctx.result("Hello World"));
+        //app.get("/", ctx -> ctx.result("Hello World"));
+        app.get("/", RootController.getIndex());
     }
 
     private static int getPort() {
