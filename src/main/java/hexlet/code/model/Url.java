@@ -14,4 +14,32 @@ public final class Url extends Model {
     private String name;
     @WhenCreated
     private Instant createdAt;
+
+    public Url(String urlName) {
+        this.name = urlName;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setId(long urlId) {
+        this.id = urlId;
+    }
+
+    public void setName(String urlName) {
+        this.name = urlName;
+    }
+
+    public void setCreatedAt(Instant instant) {
+        this.createdAt = instant;
+    }
 }

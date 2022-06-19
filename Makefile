@@ -10,6 +10,12 @@ test:
 run:
 	./gradlew run
 
+start:
+	APP_ENV=development ./gradlew run
+
+start-dist:
+	APP_ENV=production ./build/install/app/bin/app
+
 report:
 	./gradlew jacocoTestReport
 

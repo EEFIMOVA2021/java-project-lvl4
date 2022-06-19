@@ -34,7 +34,9 @@ dependencies {
     implementation 'io.javalin:javalin:4.3.0'
     implementation 'org.slf4j:slf4j-simple:1.7.36'
     testImplementation 'org.assertj:assertj-core:3.19.0'
+    implementation 'com.konghq:unirest-java:3.13.6'
     testImplementation 'com.konghq:unirest-java:3.13.0'
+    implementation 'org.jsoup:jsoup:1.14.3'
 
     implementation 'com.h2database:h2:2.1.210'
     implementation 'org.postgresql:postgresql:42.3.3'

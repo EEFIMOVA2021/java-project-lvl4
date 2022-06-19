@@ -3,26 +3,41 @@
  */
 package hexlet.code;
 
+import hexlet.code.model.Url;
+import hexlet.code.model.query.QUrl;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
 import io.javalin.Javalin;
 
+import io.ebean.DB;
+import io.ebean.Transaction;
+
 class AppTest {
     private static Javalin app;
     private static String baseUrl;
+    private static Url existingUrl;
+    private static Transaction transaction;
+    private final int successStatus = 200;
+    private final int foundStatus = 302;
+    private static final String EXAMPLE_URL = "https://www.example.com";
 
     @BeforeAll
     public static void beforeAll() {
         app = App.getApp();
         app.start(0);
         int port = app.port();
-        baseUrl = "http://localhost:" + port + "/";
+        baseUrl = "http://localhost:" + port;
+        existingUrl = new Url(EXAMPLE_URL);
+        existingUrl.save();
     }
 
     @AfterAll
@@ -30,13 +45,80 @@ class AppTest {
         app.stop();
     }
 
+    @BeforeEach
+    void beforeEach() {
+        transaction = DB.beginTransaction();
+    }
+
+    @AfterEach
+    void afterEach() {
+        transaction.rollback();
+    }
+
     @Test
     void testRoot() {
         HttpResponse<String> response = Unirest
-                .get(baseUrl)
+                .get(baseUrl + "/")
                 .asString();
         String content = response.getBody();
         assertThat(content).contains("Анализатор страниц");
         assertThat(content).contains("Бесплатно проверяйте сайты на SEO пригодность");
+    }
+
+    @Test
+    void testList() {
+        HttpResponse<String> response = Unirest
+                .get(baseUrl + "/urls")
+                .asString();
+        String content = response.getBody();
+
+        assertThat(response.getStatus()).isEqualTo(successStatus);
+        assertThat(content).contains("Сайты");
+    }
+
+    @Test
+    void testShow() {
+        HttpResponse<String> response = Unirest
+                .get(baseUrl + "/urls/" + existingUrl.getId())
+                .asString();
+        String content = response.getBody();
+
+        assertThat(response.getStatus()).isEqualTo(successStatus);
+        assertThat(content).contains(existingUrl.getName());
+    }
+
+    @Test
+    void testCreateSuccess() {
+        String testUrl = "https://ru.hexlet.io";
+        HttpResponse<String> responsePost = Unirest
+                .post(baseUrl + "/urls")
+                .field("url", testUrl)
+                .asEmpty();
+
+        assertThat(responsePost.getStatus()).isEqualTo(foundStatus);
+
+        HttpResponse<String> response = Unirest
+                .get(baseUrl + "/urls")
+                .asString();
+        String body = response.getBody();
+
+        assertThat(response.getStatus()).isEqualTo(successStatus);
+        assertThat(body).contains(testUrl);
+
+        Url dbUrl = new QUrl()
+                .name.equalTo(testUrl)
+                .findOne();
+
+        assertThat(dbUrl).isNotNull();
+        assertThat(dbUrl.getName()).isEqualTo(testUrl);
+    }
+
+    @Test
+    void testCreateFound() {
+        HttpResponse<String> responsePost = Unirest
+                .post(baseUrl + "/urls")
+                .asEmpty();
+
+        assertThat(responsePost.getStatus()).isEqualTo(foundStatus);
     }
 }
