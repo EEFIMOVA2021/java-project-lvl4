@@ -14,3 +14,6 @@ build/
 bin
 .project*
 .classpath
+
+database.mv.db
+database.trace.db
