@@ -7,13 +7,10 @@ lint:
 test:
 	./gradlew test
 
-run:
-	./gradlew run
-
-start:
+startdev:
 	APP_ENV=development ./gradlew run
 
-start-dist:
+startprod:
 	APP_ENV=production ./build/install/app/bin/app
 
 report:
