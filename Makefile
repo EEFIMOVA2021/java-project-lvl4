@@ -23,7 +23,7 @@ build: lint test
 	./gradlew clean build
 
 install:
-	./gradlew install
+	./gradlew clean install
 
 generate-migrations:
 	./gradlew generateMigrations
