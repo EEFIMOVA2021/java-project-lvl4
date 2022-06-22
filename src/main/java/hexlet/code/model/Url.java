@@ -6,6 +6,10 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.time.Instant;
 import io.ebean.annotation.WhenCreated;
+import javax.persistence.OneToMany;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public final class Url extends Model {
@@ -15,8 +19,12 @@ public final class Url extends Model {
     @WhenCreated
     private Instant createdAt;
 
+    @OneToMany
+    private List<UrlCheck> urlCheck;
+
     public Url(String urlName) {
         this.name = urlName;
+        this.urlCheck = new ArrayList<>();
     }
 
     public long getId() {
@@ -41,5 +49,13 @@ public final class Url extends Model {
 
     public void setCreatedAt(Instant instant) {
         this.createdAt = instant;
+    }
+
+    public List<UrlCheck> getUrlCheck() {
+        return urlCheck;
+    }
+
+    public void setUrlCheck(List<UrlCheck> list) {
+        this.urlCheck = list;
     }
 }

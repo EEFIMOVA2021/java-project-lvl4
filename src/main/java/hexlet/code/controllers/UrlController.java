@@ -1,6 +1,7 @@
 package hexlet.code.controllers;
 
 import hexlet.code.model.Url;
+import hexlet.code.model.UrlCheck;
 import hexlet.code.model.query.QUrl;
 import io.ebean.PagedList;
 import io.javalin.http.Handler;
@@ -10,6 +11,15 @@ import java.net.URL;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import kong.unirest.HttpResponse;
+import kong.unirest.Unirest;
+import kong.unirest.UnirestException;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 public final class UrlController {
 
@@ -94,6 +104,39 @@ public final class UrlController {
         ctx.redirect("/urls");
     };
 
+    private static Handler check = ctx -> {
+        int id = ctx.pathParamAsClass("id", Integer.class).getOrDefault(null);
+        UrlCheck urlCheck = new UrlCheck();
+        Url dbUrl = new QUrl()
+                .id.equalTo(id)
+                .findOne();
+        if (dbUrl == null) {
+            throw new NotFoundResponse();
+        }
+        String urlStr = dbUrl.getName();
+        try {
+            HttpResponse<String> response = Unirest.get(urlStr).asString();
+            String html = response.getBody();
+            Document doc = Jsoup.parse(html);
+            String title = doc.title();
+            Elements h1 = doc.getElementsByTag("h1");
+            Element meta = doc.selectFirst("meta[name=description]");
+            urlCheck.setUrl(dbUrl);
+            urlCheck.setStatusCode(response.getStatus());
+            urlCheck.setTitle(title);
+            urlCheck.setH1(h1.hasText() ? h1.text() : "");
+            urlCheck.setDescription(meta != null && meta.hasAttr("content") ? meta.attr("content") : "");
+            urlCheck.save();
+            ctx.sessionAttribute("flash", "Страница успешно проверена");
+            ctx.sessionAttribute("flash-type", "success");
+            ctx.attribute("url", dbUrl);
+        } catch (UnirestException e) {
+            ctx.sessionAttribute("flash", "Страница недоступна");
+            ctx.sessionAttribute("flash-type", "danger");
+        }
+        ctx.redirect("/urls/" + id);
+    };
+
     public static Handler listUrl() {
         return list;
     }
@@ -104,5 +147,9 @@ public final class UrlController {
 
     public static Handler showUrl() {
         return show;
+    }
+
+    public static Handler checkUrl() {
+        return check;
     }
 }
